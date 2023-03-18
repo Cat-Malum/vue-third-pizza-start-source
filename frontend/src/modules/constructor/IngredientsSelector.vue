@@ -10,20 +10,22 @@
             >
                 <app-drag
                     :data-transfer="ingredientType"
-                    :draggable="getValue(ingredientType.value) < MAX_INGREDIENT_COUNT"
+                    :draggable="values[ingredientType.id] < MAX_INGREDIENT_COUNT"
                 >
                     <div class="filling">
                         <img
-                            :src="getImage(ingredientType.image)"
+                            :src="getImage(ingredient.image)"
                             :alt="ingredientType.name"
                         />
                         {{ ingredientType.name }}
                     </div>
                 </app-drag>
                 <app-counter
-                    :class="ingredients__counter"
+                    class="ingredients__counter"
                     :element="ingredientType"
-                    :maxCount="3"
+                    :min="0"
+                    :max="MAX_INGREDIENT_COUNT"
+                    @input="inputValue(ingredient.id, $event)"
                 />
             </li>
         </ul>
@@ -50,20 +52,8 @@
     const emit = defineEmits(["update"]);
     const values = toRef(props, "values");
     
-    const getValue = (ingredient) => {
-        return values.value[ingredient] ?? 0;
-    };
-    
     const setValue = (ingredient, count) => {
         emit("update", ingredient, Number(count));
-    };
-    
-    const decrementValue = (ingredient) => {
-        setValue(ingredient, getValue(ingredient) - 1);
-    };
-    
-    const incrementValue = (ingredient) => {
-        setValue(ingredient, getValue(ingredient) + 1);
     };
     
     const inputValue = (ingredient, count) => {
