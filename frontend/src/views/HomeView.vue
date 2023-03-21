@@ -1,5 +1,5 @@
 <template>
-    <main class="content">
+    <main v-if="dataStore.isDataLoaded" class="content">
         <form action="#" method="post">
             <div class="content__wrapper">
                 <h1 class="title title--big">Конструктор пиццы</h1>
@@ -54,82 +54,84 @@
 </template>
 
 <script setup>
-    import { computed, onMounted } from "vue";
-    import DoughSelector from "@/modules/constructor/DoughSelector.vue";
-    import DiameterSelector from "@/modules/constructor/DiameterSelector.vue";
-    import SauceSelector from "@/modules/constructor/SauceSelector.vue";
-    import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
-    import PizzaConstructor from "@/modules/constructor/PizzaConstructor.vue";
-    import { usePizzaStore } from "@/stores/pizza";
-    import { useDataStore } from "@/stores/data";
-    import { useCartStore } from "@/stores/cart";
-    import { useRouter } from "vue-router";
+  import { computed, onMounted } from "vue";
+  import DoughSelector from "@/modules/constructor/DoughSelector.vue";
+  import DiameterSelector from "@/modules/constructor/DiameterSelector.vue";
+  import SauceSelector from "@/modules/constructor/SauceSelector.vue";
+  import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
+  import PizzaConstructor from "@/modules/constructor/PizzaConstructor.vue";
+  import { usePizzaStore } from "@/stores/pizza";
+  import { useDataStore } from "@/stores/data";
+  import { useCartStore } from "@/stores/cart";
+  import { useRouter } from "vue-router";
 
-    const dataStore = useDataStore();
-    const pizzaStore = usePizzaStore();
-    const cartStore = useCartStore();
+  const dataStore = useDataStore();
+  const pizzaStore = usePizzaStore();
+  const cartStore = useCartStore();
 
-    const router = useRouter();
+  const router = useRouter();
 
-    const name = computed({
-        get() {
-            return pizzaStore.name;
-        },
-        set(value) {
-            pizzaStore.setName(value);
-        },
-    });
+  const name = computed({
+    get() {
+      return pizzaStore.name;
+    },
+    set(value) {
+      pizzaStore.setName(value);
+    },
+  });
 
-    const doughId = computed({
-        get() {
-            return pizzaStore.doughId;
-        },
-        set(value) {
-            pizzaStore.setDough(value);
-        },
-    });
+  const doughId = computed({
+    get() {
+      return pizzaStore.doughId;
+    },
+    set(value) {
+      pizzaStore.setDough(value);
+    },
+  });
 
-    const sizeId = computed({
-        get() {
-            return pizzaStore.sizeId;
-        },
-        set(value) {
-            pizzaStore.setSize(value);
-        },
-    });
+  const sizeId = computed({
+    get() {
+      return pizzaStore.sizeId;
+    },
+    set(value) {
+      pizzaStore.setSize(value);
+    },
+  });
 
-    const sauceId = computed({
-        get() {
-            return pizzaStore.sauceId;
-        },
-        set(value) {
-            pizzaStore.setSauce(value);
-        },
-    });
+  const sauceId = computed({
+    get() {
+      return pizzaStore.sauceId;
+    },
+    set(value) {
+      pizzaStore.setSauce(value);
+    },
+  });
 
-    const disableSubmit = computed(() => {
-        return name.value.length === 0 || pizzaStore.price === 0;
-    });
+  const disableSubmit = computed(() => {
+    return name.value.length === 0 || pizzaStore.price === 0;
+  });
 
-    const addToCart = async () => {
-        cartStore.savePizza(pizzaStore.$state);
-        await router.push({ name: "cart" });
-        resetPizza();
-    };
+  const addToCart = async () => {
+    cartStore.savePizza(pizzaStore.$state);
+    await router.push({ name: "cart" });
+    resetPizza();
+  };
 
-    const resetPizza = () => {
-        pizzaStore.setName("");
-        pizzaStore.setDough(dataStore.doughs[0].id);
-        pizzaStore.setSize(dataStore.sizes[0].id);
-        pizzaStore.setSauce(dataStore.sauces[0].id);
-        pizzaStore.setIngredients([]);
-    };
+  const resetPizza = () => {
+    pizzaStore.setName("");
+    if (dataStore.isDataLoaded) {
+      pizzaStore.setDough(dataStore.doughs[0].id);
+      pizzaStore.setSize(dataStore.sizes[0].id);
+      pizzaStore.setSauce(dataStore.sauces[0].id);
+      pizzaStore.setIngredients([]);
+    }
+  };
 
-    onMounted(() => {
-        if (pizzaStore.index === null) {
-            resetPizza();
-        }
-    });
+  onMounted(() => {
+    if (pizzaStore.index === null) {
+      resetPizza();
+    }
+  });
 </script>
 
 <style lang="scss">
